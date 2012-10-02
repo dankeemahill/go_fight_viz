@@ -54,8 +54,8 @@ class Command(BaseCommand):
 		team_title = title.split(' - ')
 		#always be makin' exceptions for football
 		if team_title[0] == '2012 Roster':
-			team_title[0] = 'Football'
-		team = {'team':  team_title[0]}
+			team_title[0] = 'Minnesota Football'
+		team = {'team': 'Minnesota ' + team_title[0]}
 		#player_payload.append({'team': team_title[0]})
 
 		table = soup.select('table#sortable_roster')[0]

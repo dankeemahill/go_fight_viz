@@ -19,7 +19,7 @@ class Command(BaseCommand):
 		request = requests.get(home_url)
 		soup = BeautifulSoup(request.content)
 
-		team = {'team': "Michigan State Men's Basketball"}
+		team = {'team': "Nebraska Men's Basketball"}
 		#player_payload.append({'team': team_title[0]})
 
 		table = soup.select('table')[4]
@@ -41,10 +41,10 @@ class Command(BaseCommand):
 			name_list = cells[1].get_text().split()
 			backwards_name = ''
 			for word in name_list:
-				backwards_name = backwards_name + word
+				backwards_name = backwards_name + word + ' '
 			self.process_name(backwards_name, player_data)
 
-			position = {'position': the_position.split()[0]} 
+			position = {'position': cells[2].get_text().split()[0]} 
 			player_data.update(position)
 
 			#TO DO: HEIGHT WEIGHT CHALLENGING TO SCRAPE
@@ -56,7 +56,7 @@ class Command(BaseCommand):
 			#	weight = {'weight': cells[-3].get_text()}
 			#	player_data.update(weight)
 
-			year = {'year': cells[-2].get_text().split[0]}
+			year = {'year': cells[-2].get_text().split()[0]}
 			player_data.update(year)
 
 			town_school = cells[-1].get_text()
@@ -70,8 +70,10 @@ class Command(BaseCommand):
 		try:
 			last_first = backwards_name.split(',')
 			last_name = last_first[0]
-			first_name = last_first[1][1:]
-			name = {'name': first_name + ' '+ last_name}
+			first_name = last_first[1]
+			#cut off lead space
+			first_name = first_name[1:]
+			name = {'name': first_name + last_name}
 			player_data.update(name)
 
 		except IndexError:
@@ -82,16 +84,31 @@ class Command(BaseCommand):
 	def process_town_school(self, town_school, player_data):
 
 		try:
-			split = town_school.split('/')
-			school = split[1]
+			split = town_school.split('(')
 			town = split[0]
+			town = town.split()
+			location = ''
+			for place in town:
+				location = location + ' ' + place
+			#cut off extra space
+			location = location[1:]
+
+			school = split[1]
+			school = school.split()
+			the_school = ''
+			#lp stands for learning place
+			for lp in school:
+				the_school = the_school + lp + ' '
+			#cut off the extra space and ')'
+			the_school = the_school[:-2]
+
 		#some players only have a hometown listed
 		except IndexError:
 			town = town_school
 			school = ''
 
-		player_data.update({'town': town})
-		player_data.update({'school': school})
+		player_data.update({'town': location})
+		player_data.update({'school': the_school})
 
 		return player_data
 
